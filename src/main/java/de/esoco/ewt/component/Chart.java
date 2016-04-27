@@ -659,7 +659,7 @@ public class Chart extends Component implements Runnable
 		 */
 		@Override
 		public Widget createWidget(
-			UserInterfaceContext rContext,
+			Component rComponent,
 			StyleData			 rStyle)
 		{
 			return new SimplePanel();

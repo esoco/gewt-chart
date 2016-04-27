@@ -309,7 +309,7 @@ public class Chart extends Component implements Runnable
 
 	static
 	{
-		EWT.registerComponentWidgetFactory(Chart.class,
+		EWT.registerWidgetFactory(Chart.class,
 										   new ChartWidgetFactory(),
 										   false);
 	}

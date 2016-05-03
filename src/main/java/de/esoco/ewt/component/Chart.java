@@ -1,6 +1,6 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // This file is a part of the 'gewt-chart' project.
-// Copyright 2015 Elmar Sonnenschein, esoco GmbH, Flensburg, Germany
+// Copyright 2016 Elmar Sonnenschein, esoco GmbH, Flensburg, Germany
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 package de.esoco.ewt.component;
 
+import de.esoco.ewt.EWT;
 import de.esoco.ewt.UserInterfaceContext;
 import de.esoco.ewt.event.EventType;
 import de.esoco.ewt.impl.gwt.GeoChart;
 import de.esoco.ewt.impl.gwt.GeoChart.DisplayMode;
 import de.esoco.ewt.impl.gwt.GewtResources;
+import de.esoco.ewt.impl.gwt.WidgetFactory;
+import de.esoco.ewt.style.StyleData;
 
 import de.esoco.lib.model.DataSet;
 import de.esoco.lib.model.StringDataSet;
@@ -32,6 +35,7 @@ import com.chap.links.client.Network;
 
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.AbstractDrawOptions;
 import com.google.gwt.visualization.client.DataTable;
@@ -301,6 +305,15 @@ public class Chart extends Component implements Runnable
 		}
 	}
 
+	//~ Static fields/initializers ---------------------------------------------
+
+	static
+	{
+		EWT.registerWidgetFactory(Chart.class,
+										   new ChartWidgetFactory(),
+										   false);
+	}
+
 	//~ Instance fields --------------------------------------------------------
 
 	private ChartType eChartType;
@@ -314,22 +327,6 @@ public class Chart extends Component implements Runnable
 
 	private Visualization<AbstractDrawOptions> aVisualization;
 	private AbstractDrawOptions				   aOptions;
-
-	//~ Constructors -----------------------------------------------------------
-
-	/***************************************
-	 * Creates a new instance.
-	 *
-	 * @param eType The type of chart to display or NULL if it is set later
-	 *              through the method {@link #setChartType(ChartType)}
-	 */
-	public Chart(ChartType eType)
-	{
-		super(new SimplePanel());
-
-		this.eChartType = eType;
-		setDefaultStyleName(GewtResources.INSTANCE.css().ewtChart());
-	}
 
 	//~ Static methods ---------------------------------------------------------
 
@@ -491,6 +488,17 @@ public class Chart extends Component implements Runnable
 	}
 
 	/***************************************
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void initWidget(UserInterfaceContext rContext, StyleData rStyle)
+	{
+		super.initWidget(rContext, rStyle);
+
+		setDefaultStyleName(GewtResources.INSTANCE.css().ewtChart());
+	}
+
+	/***************************************
 	 * Returns TRUE if the chart is rendered in 3D.
 	 *
 	 * @return The 3D flag
@@ -636,6 +644,27 @@ public class Chart extends Component implements Runnable
 	}
 
 	//~ Inner Classes ----------------------------------------------------------
+
+	/********************************************************************
+	 * Widget factory for this component.
+	 *
+	 * @author eso
+	 */
+	public static class ChartWidgetFactory implements WidgetFactory<Widget>
+	{
+		//~ Methods ------------------------------------------------------------
+
+		/***************************************
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Widget createWidget(
+			Component rComponent,
+			StyleData			 rStyle)
+		{
+			return new SimplePanel();
+		}
+	}
 
 	/********************************************************************
 	 * Dispatcher for list-specific events.

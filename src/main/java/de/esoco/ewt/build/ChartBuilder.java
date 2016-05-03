@@ -1,6 +1,6 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // This file is a part of the 'gewt-chart' project.
-// Copyright 2015 Elmar Sonnenschein, esoco GmbH, Flensburg, Germany
+// Copyright 2016 Elmar Sonnenschein, esoco GmbH, Flensburg, Germany
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package de.esoco.ewt.build;
 
 import de.esoco.ewt.component.Chart;
+import de.esoco.ewt.component.Chart.ChartType;
 import de.esoco.ewt.style.StyleData;
 
 
@@ -43,19 +44,20 @@ public class ChartBuilder
 	 *
 	 * @param  rBuilder   The builder to build the chart with
 	 * @param  rStyleData The style data
-	 * @param  rType      The type of chart to display or NULL if it is set
+	 * @param  eChartType The type of chart to display or NULL if it is set
 	 *                    later through {@link Chart#setChartType(ChartType)}
 	 *
 	 * @return The new component
 	 */
 	public static Chart addChart(ContainerBuilder<?> rBuilder,
 								 StyleData			 rStyleData,
-								 Chart.ChartType	 rType)
+								 ChartType			 eChartType)
 	{
-		Chart aComponent = new Chart(rType);
+		Chart aChart = new Chart();
 
-		rBuilder.addComponent(aComponent, rStyleData, null, null);
+		rBuilder.addComponent(aChart, rStyleData, null, null);
+		aChart.setChartType(eChartType);
 
-		return aComponent;
+		return aChart;
 	}
 }

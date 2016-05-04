@@ -309,9 +309,7 @@ public class Chart extends Component implements Runnable
 
 	static
 	{
-		EWT.registerWidgetFactory(Chart.class,
-										   new ChartWidgetFactory(),
-										   false);
+		EWT.registerWidgetFactory(Chart.class, new ChartWidgetFactory(), false);
 	}
 
 	//~ Instance fields --------------------------------------------------------
@@ -491,9 +489,9 @@ public class Chart extends Component implements Runnable
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void initWidget(UserInterfaceContext rContext, StyleData rStyle)
+	public void initWidget(Container rParent, StyleData rStyle)
 	{
-		super.initWidget(rContext, rStyle);
+		super.initWidget(rParent, rStyle);
 
 		setDefaultStyleName(GewtResources.INSTANCE.css().ewtChart());
 	}
@@ -658,9 +656,7 @@ public class Chart extends Component implements Runnable
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Widget createWidget(
-			Component rComponent,
-			StyleData			 rStyle)
+		public Widget createWidget(Component rComponent, StyleData rStyle)
 		{
 			return new SimplePanel();
 		}

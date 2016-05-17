@@ -460,9 +460,10 @@ public class Chart extends Component implements Runnable
 	 *
 	 * @return The background color
 	 */
-	public final String getBackgroundColor()
+	@Override
+	public final int getBackgroundColor()
 	{
-		return sBackgroundColor;
+		return Integer.parseInt(sBackgroundColor, 16);
 	}
 
 	/***************************************

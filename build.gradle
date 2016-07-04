@@ -18,7 +18,6 @@ targetCompatibility = 1.7
 
 repositories {
     jcenter()
-	flatDir { dirs project.getProjectDir().toString() + '/lib' }
 }
 
 dependencies
@@ -32,8 +31,7 @@ dependencies
 		compile 'de.esoco:gewt:1.+'
 	}
 
-	compile name: 'gwt-visualization'
-	compile name: 'gwt-links-network'
+	compile 'com.googlecode.gwt-charts:gwt-charts:0.9.10'
     testCompile 'junit:junit:4.+'
 }
 

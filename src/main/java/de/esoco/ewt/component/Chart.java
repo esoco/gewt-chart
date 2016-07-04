@@ -19,41 +19,53 @@ package de.esoco.ewt.component;
 import de.esoco.ewt.EWT;
 import de.esoco.ewt.UserInterfaceContext;
 import de.esoco.ewt.event.EventType;
-import de.esoco.ewt.impl.gwt.GeoChart;
-import de.esoco.ewt.impl.gwt.GeoChart.DisplayMode;
 import de.esoco.ewt.impl.gwt.GewtResources;
 import de.esoco.ewt.impl.gwt.WidgetFactory;
 import de.esoco.ewt.style.StyleData;
 
 import de.esoco.lib.model.DataSet;
-import de.esoco.lib.model.StringDataSet;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.chap.links.client.Network;
-
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.AbstractDrawOptions;
-import com.google.gwt.visualization.client.DataTable;
-import com.google.gwt.visualization.client.LegendPosition;
-import com.google.gwt.visualization.client.VisualizationUtils;
-import com.google.gwt.visualization.client.events.OnMouseOutHandler;
-import com.google.gwt.visualization.client.events.OnMouseOverHandler;
-import com.google.gwt.visualization.client.events.RegionClickHandler;
-import com.google.gwt.visualization.client.events.SelectHandler;
-import com.google.gwt.visualization.client.visualizations.Visualization;
-import com.google.gwt.visualization.client.visualizations.corechart.AreaChart;
-import com.google.gwt.visualization.client.visualizations.corechart.BarChart;
-import com.google.gwt.visualization.client.visualizations.corechart.ColumnChart;
-import com.google.gwt.visualization.client.visualizations.corechart.CoreChart;
-import com.google.gwt.visualization.client.visualizations.corechart.LineChart;
-import com.google.gwt.visualization.client.visualizations.corechart.Options;
-import com.google.gwt.visualization.client.visualizations.corechart.PieChart;
-import com.google.gwt.visualization.client.visualizations.corechart.PieChart.PieOptions;
+
+import com.googlecode.gwt.charts.client.ChartLoader;
+import com.googlecode.gwt.charts.client.ChartPackage;
+import com.googlecode.gwt.charts.client.ChartWidget;
+import com.googlecode.gwt.charts.client.ColumnType;
+import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.corechart.AreaChart;
+import com.googlecode.gwt.charts.client.corechart.AreaChartOptions;
+import com.googlecode.gwt.charts.client.corechart.BarChart;
+import com.googlecode.gwt.charts.client.corechart.BarChartOptions;
+import com.googlecode.gwt.charts.client.corechart.ColumnChart;
+import com.googlecode.gwt.charts.client.corechart.ColumnChartOptions;
+import com.googlecode.gwt.charts.client.corechart.CoreChartWidget;
+import com.googlecode.gwt.charts.client.corechart.LineChart;
+import com.googlecode.gwt.charts.client.corechart.LineChartOptions;
+import com.googlecode.gwt.charts.client.corechart.PieChart;
+import com.googlecode.gwt.charts.client.corechart.PieChartOptions;
+import com.googlecode.gwt.charts.client.event.OnMouseOutEvent;
+import com.googlecode.gwt.charts.client.event.OnMouseOutHandler;
+import com.googlecode.gwt.charts.client.event.OnMouseOverEvent;
+import com.googlecode.gwt.charts.client.event.OnMouseOverHandler;
+import com.googlecode.gwt.charts.client.event.RegionClickEvent;
+import com.googlecode.gwt.charts.client.event.RegionClickHandler;
+import com.googlecode.gwt.charts.client.event.SelectEvent;
+import com.googlecode.gwt.charts.client.event.SelectHandler;
+import com.googlecode.gwt.charts.client.geochart.GeoChart;
+import com.googlecode.gwt.charts.client.geochart.GeoChartColorAxis;
+import com.googlecode.gwt.charts.client.geochart.GeoChartOptions;
+import com.googlecode.gwt.charts.client.options.CoreOptions;
+import com.googlecode.gwt.charts.client.options.DisplayMode;
+import com.googlecode.gwt.charts.client.options.Legend;
+import com.googlecode.gwt.charts.client.options.LegendPosition;
+import com.googlecode.gwt.charts.client.options.Options;
 
 
 /********************************************************************
@@ -61,7 +73,7 @@ import com.google.gwt.visualization.client.visualizations.corechart.PieChart.Pie
  *
  * @author eso
  */
-public class Chart extends Component implements Runnable
+public class Chart extends Component
 {
 	//~ Enums ------------------------------------------------------------------
 
@@ -71,12 +83,12 @@ public class Chart extends Component implements Runnable
 	public enum ChartLegendPosition
 	{
 		TOP(LegendPosition.TOP), BOTTOM(LegendPosition.BOTTOM),
-		LEFT(LegendPosition.LEFT), RIGHT(LegendPosition.RIGHT),
+		LEFT(LegendPosition.IN), RIGHT(LegendPosition.RIGHT),
 		NONE(LegendPosition.NONE);
 
 		//~ Instance fields ----------------------------------------------------
 
-		final LegendPosition rGwtLegendPosition;
+		final LegendPosition rImplLegendPosition;
 
 		//~ Constructors -------------------------------------------------------
 
@@ -88,7 +100,7 @@ public class Chart extends Component implements Runnable
 		 */
 		private ChartLegendPosition(LegendPosition rGwtLegendPosition)
 		{
-			this.rGwtLegendPosition = rGwtLegendPosition;
+			this.rImplLegendPosition = rGwtLegendPosition;
 		}
 	}
 
@@ -97,164 +109,110 @@ public class Chart extends Component implements Runnable
 	 */
 	public enum ChartType
 	{
-		AREA(AreaChart.PACKAGE)
+		AREA()
 		{
 			@Override
-			public Visualization<?> createChart(
-				List<DataTable>		rData,
-				AbstractDrawOptions rOptions)
+			public ChartWidget<?> createChart()
 			{
-				return new AreaChart(rData.get(0), (Options) rOptions);
+				return new AreaChart();
+			}
+			@Override
+			public Options createOptions(boolean b3D)
+			{
+				return AreaChartOptions.create();
 			}
 		},
-		BAR(BarChart.PACKAGE)
+		BAR()
 		{
 			@Override
-			public Visualization<?> createChart(
-				List<DataTable>		rData,
-				AbstractDrawOptions rOptions)
+			public ChartWidget<?> createChart()
 			{
-				return new BarChart(rData.get(0), (Options) rOptions);
-			}
-		},
-		COLUMN(ColumnChart.PACKAGE)
-		{
-			@Override
-			public Visualization<?> createChart(
-				List<DataTable>		rData,
-				AbstractDrawOptions rOptions)
-			{
-				return new ColumnChart(rData.get(0), (Options) rOptions);
-			}
-		},
-		GEO_MAP(GeoChart.PACKAGE)
-		{
-			@Override
-			public Visualization<?> createChart(
-				List<DataTable>		rData,
-				AbstractDrawOptions rOptions)
-			{
-				return new GeoChart(rData.get(0), (GeoChart.Options) rOptions);
+				return new BarChart();
 			}
 
 			@Override
-			public AbstractDrawOptions createOptions(boolean b3D)
+			public Options createOptions(boolean b3D)
 			{
-				GeoChart.Options aOptions = GeoChart.Options.create();
+				return BarChartOptions.create();
+			}
+		},
+		COLUMN()
+		{
+			@Override
+			public ChartWidget<?> createChart()
+			{
+				return new ColumnChart();
+			}
+			@Override
+			public Options createOptions(boolean b3D)
+			{
+				return ColumnChartOptions.create();
+			}
+		},
+		GEO_MAP()
+		{
+			@Override
+			public ChartWidget<?> createChart()
+			{
+				return new GeoChart();
+			}
 
+			@Override
+			public GeoChartOptions createOptions(boolean b3D)
+			{
+				GeoChartColorAxis aColors  = GeoChartColorAxis.create();
+				GeoChartOptions   aOptions = GeoChartOptions.create();
+
+				aColors.setColors(new String[] { "68B7D4", "88D7F4" });
+
+				aOptions.setColorAxis(aColors);
 				aOptions.setDisplayMode(DisplayMode.REGIONS);
-				aOptions.setDatalessRegionColor("FFD0C0");
+				aOptions.setDatalessRegionColor("E0F0FF");
+				aOptions.hideLegend();
 
 				return aOptions;
 			}
 		},
-		LINE(LineChart.PACKAGE)
+		LINE()
 		{
 			@Override
-			public Visualization<?> createChart(
-				List<DataTable>		rData,
-				AbstractDrawOptions rOptions)
+			public ChartWidget<?> createChart()
 			{
-				return new LineChart(rData.get(0), (Options) rOptions);
+				return new LineChart();
+			}
+			@Override
+			public Options createOptions(boolean b3D)
+			{
+				return LineChartOptions.create();
 			}
 		},
 
-		PIE(PieChart.PACKAGE)
+		PIE()
 		{
 			@Override
-			public Visualization<?> createChart(
-				List<DataTable>		rData,
-				AbstractDrawOptions rOptions)
+			public ChartWidget<?> createChart()
 			{
-				return new PieChart(rData.get(0), (Options) rOptions);
+				return new PieChart();
 			}
 
 			@Override
-			public AbstractDrawOptions createOptions(boolean b3D)
+			public PieChartOptions createOptions(boolean b3D)
 			{
-				PieOptions aOptions = PieOptions.create();
+				PieChartOptions aOptions = PieChartOptions.create();
 
-				aOptions.set3D(b3D);
-
-				return aOptions;
-			}
-		},
-
-		/**
-		 * Network chart data. Input data format must be a {@link StringDataSet}
-		 * with rows of four columns containing the following node data:
-		 *
-		 * <ol>
-		 *   <li>Node ID: a unique identifier for the node.</li>
-		 *   <li>Parent ID: The ID of the parent node or NULL for a root node.
-		 *     Can be an empty string if the parent is the same as for the
-		 *     previous node.</li>
-		 *   <li>Text: the text to be displayed for the node.</li>
-		 *   <li>Style: the style name of the node.</li>
-		 * </ol>
-		 */
-		NETWORK(null)
-		{
-			/***************************************
-			 * @see ChartType#createChartData(UserInterfaceContext, DataSet)
-			 */
-			@Override
-			@SuppressWarnings("unchecked")
-			List<DataTable> createChartData(
-				UserInterfaceContext rContext,
-				DataSet<?>			 rData)
-			{
-				return createNetworkChartTables((DataSet<String>) rData);
-			}
-
-			/***************************************
-			 * @see http://almende.github.io/chap-links-library/
-			 */
-			@Override
-			public Visualization<?> createChart(
-				List<DataTable>		rData,
-				AbstractDrawOptions rOptions)
-			{
-				DataTable rNodes = rData.get(0);
-
-				if (rData.size() == 1)
-				{
-					return new Network(rNodes, (Network.Options) rOptions);
-				}
-				else
-				{
-					return new Network(rNodes,
-									   rData.get(1),
-									   (Network.Options) rOptions);
-				}
-			}
-
-			@Override
-			@SuppressWarnings("boxing")
-			public AbstractDrawOptions createOptions(boolean b3D)
-			{
-				Network.Options aOptions = Network.Options.create();
-
-				aOptions.set("stabilize", true);
+				aOptions.setIs3D(b3D);
 
 				return aOptions;
 			}
 		};
 
-		//~ Instance fields ----------------------------------------------------
-
-		private final String sGwtVisualizationPackage;
-
 		//~ Constructors -------------------------------------------------------
 
 		/***************************************
 		 * Creates a new instance.
-		 *
-		 * @param sPackage The GWT visualization package library
 		 */
-		ChartType(String sPackage)
+		private ChartType()
 		{
-			sGwtVisualizationPackage = sPackage;
 		}
 
 		//~ Methods ------------------------------------------------------------
@@ -262,14 +220,9 @@ public class Chart extends Component implements Runnable
 		/***************************************
 		 * Create a new chart visualization instance.
 		 *
-		 * @param  rData    The initial chart data
-		 * @param  rOptions The initial chart options
-		 *
 		 * @return The new chart widget
 		 */
-		abstract Visualization<?> createChart(
-			List<DataTable>		rData,
-			AbstractDrawOptions rOptions);
+		abstract ChartWidget<?> createChart();
 
 		/***************************************
 		 * Creates the GWT visualization data tables for this chart type. The
@@ -297,15 +250,20 @@ public class Chart extends Component implements Runnable
 		 *
 		 * @return The options object
 		 */
-		AbstractDrawOptions createOptions(boolean b3D)
+		Options createOptions(boolean b3D)
 		{
-			Options aOptions = Options.create();
+			Options aOptions = CoreOptions.create();
 
 			return aOptions;
 		}
 	}
 
 	//~ Static fields/initializers ---------------------------------------------
+
+	// static fields for chart API loading
+	private static ChartLoader aChartLoader    = null;
+	private static boolean     bChartApiLoaded = false;
+	private static List<Chart> aDeferredCharts = new ArrayList<>();
 
 	static
 	{
@@ -314,17 +272,18 @@ public class Chart extends Component implements Runnable
 
 	//~ Instance fields --------------------------------------------------------
 
-	private ChartType eChartType;
+	private ChartWidget<?> aChartWidget;
 
+	private ChartType		    eChartType;
 	private ChartLegendPosition eLegendPosition;
-	private String			    sBackgroundColor = null;
-	private boolean			    bIs3D			 = false;
-	private boolean			    bIsStacked		 = false;
 
-	private DataSet<?> rData;
+	private String  sBackgroundColor = null;
+	private boolean bIs3D			 = false;
+	private boolean bIsStacked		 = false;
 
-	private Visualization<AbstractDrawOptions> aVisualization;
-	private AbstractDrawOptions				   aOptions;
+	private DataSet<?>	    rChartData;
+	private List<DataTable> aDataTables;
+	private Options		    aOptions;
 
 	//~ Static methods ---------------------------------------------------------
 
@@ -518,55 +477,30 @@ public class Chart extends Component implements Runnable
 	}
 
 	/***************************************
-	 * @see Runnable#run()
+	 * @see de.esoco.ewt.component.Component#repaint()
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void run()
+	public void repaint()
 	{
-		SimplePanel rPanel = (SimplePanel) getWidget();
-
-		aOptions = eChartType.createOptions(bIs3D);
-
-		if (aOptions instanceof Options)
+		if (!bChartApiLoaded)
 		{
-			Options rStandardOptions = (Options) aOptions;
+			aDeferredCharts.add(this);
 
-			rStandardOptions.setIsStacked(bIsStacked);
-
-			if (sBackgroundColor != null)
+			if (aChartLoader == null)
 			{
-				rStandardOptions.setBackgroundColor(sBackgroundColor);
+				loadChartApi(ChartPackage.CORECHART, ChartPackage.GEOCHART);
 			}
-
-			if (eLegendPosition != null)
-			{
-				rStandardOptions.setLegend(eLegendPosition.rGwtLegendPosition);
-			}
-		}
-
-		List<DataTable> aDataTables =
-			eChartType.createChartData(getContext(), rData);
-
-		DataTable aFirstTable = aDataTables.get(0);
-
-		if (aFirstTable.getNumberOfRows() > 0 &&
-			aFirstTable.getNumberOfColumns() > 0)
-		{
-			aVisualization =
-				(Visualization<AbstractDrawOptions>) eChartType.createChart(aDataTables,
-																			aOptions);
-			rPanel.setWidget(aVisualization);
-			new ChartEventDispatcher().initEventDispatching(aVisualization);
 		}
 		else
 		{
-			HTML aLabel =
-				new HTML(getContext().expandResource("$lblNoEwtChartData"));
+			if (aChartWidget == null)
+			{
+				init();
+			}
 
-			aLabel.addStyleName(GewtResources.INSTANCE.css()
-								.ewtNoChartDataLabel());
-			rPanel.setWidget(aLabel);
+			((ChartWidget<Options>) aChartWidget).draw(aDataTables.get(0),
+													   aOptions);
 		}
 	}
 
@@ -609,17 +543,7 @@ public class Chart extends Component implements Runnable
 	 */
 	public void setData(DataSet<?> rDataSet)
 	{
-		rData = rDataSet;
-
-		if (eChartType.sGwtVisualizationPackage != null)
-		{
-			VisualizationUtils.loadVisualizationApi(this,
-													eChartType.sGwtVisualizationPackage);
-		}
-		else
-		{
-			VisualizationUtils.loadVisualizationApi(this);
-		}
+		rChartData = rDataSet;
 	}
 
 	/***************************************
@@ -640,6 +564,122 @@ public class Chart extends Component implements Runnable
 	public final void setStacked(boolean bStacked)
 	{
 		bIsStacked = bStacked;
+	}
+
+	/***************************************
+	 * Invoked when the chart javascript API has been fully loaded.
+	 */
+	void chartApiLoaded()
+	{
+		bChartApiLoaded = true;
+
+		for (Chart rDeferredChart : aDeferredCharts)
+		{
+			if (rDeferredChart.aChartWidget == null)
+			{
+				rDeferredChart.init();
+				rDeferredChart.repaint();
+			}
+		}
+
+		aDeferredCharts = null;
+	}
+
+	/***************************************
+	 * Initializes the chart.
+	 */
+	private void init()
+	{
+		HasWidgets rChartPanel = (HasWidgets) getWidget();
+
+		aOptions = eChartType.createOptions(bIs3D);
+
+		if (aOptions instanceof CoreOptions)
+		{
+			CoreOptions rCoreOptions = (CoreOptions) aOptions;
+
+			if (sBackgroundColor != null)
+			{
+				rCoreOptions.setBackgroundColor(sBackgroundColor);
+			}
+
+			if (eLegendPosition != null)
+			{
+				Legend aLegend = Legend.create();
+
+				aLegend.setPosition(eLegendPosition.rImplLegendPosition);
+				rCoreOptions.setLegend(aLegend);
+			}
+		}
+
+		if (aOptions instanceof AreaChartOptions)
+		{
+			((AreaChartOptions) aOptions).setIsStacked(bIsStacked);
+		}
+		else if (aOptions instanceof BarChartOptions)
+		{
+			((BarChartOptions) aOptions).setIsStacked(bIsStacked);
+		}
+		else if (aOptions instanceof ColumnChartOptions)
+		{
+			((ColumnChartOptions) aOptions).setIsStacked(bIsStacked);
+		}
+		else if (aOptions instanceof GeoChartOptions)
+		{
+			((GeoChartOptions) aOptions).hideLegend();
+		}
+
+		aDataTables = eChartType.createChartData(getContext(), rChartData);
+
+		DataTable aFirstTable = aDataTables.get(0);
+
+		if (aFirstTable.getNumberOfRows() > 0 &&
+			aFirstTable.getNumberOfColumns() > 0)
+		{
+			aChartWidget = eChartType.createChart();
+
+			rChartPanel.add(aChartWidget);
+			new ChartEventDispatcher().initEventDispatching(aChartWidget);
+		}
+		else
+		{
+			HTML aLabel =
+				new HTML(getContext().expandResource("$lblNoEwtChartData"));
+
+			aLabel.addStyleName(GewtResources.INSTANCE.css()
+								.ewtNoChartDataLabel());
+			rChartPanel.add(aLabel);
+		}
+	}
+
+	/***************************************
+	 * Loads the external chart API.
+	 *
+	 * @param rPackages The chart packages to load the API for
+	 */
+	private void loadChartApi(ChartPackage... rPackages)
+	{
+		aChartLoader = new ChartLoader(rPackages);
+
+		aChartLoader.loadApi(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					bChartApiLoaded = true;
+
+					for (Chart rDeferredChart : aDeferredCharts)
+					{
+						if (rDeferredChart.aChartWidget == null)
+						{
+							rDeferredChart.init();
+							rDeferredChart.repaint();
+						}
+					}
+
+					aDeferredCharts = null;
+				}
+			});
 	}
 
 	//~ Inner Classes ----------------------------------------------------------
@@ -675,13 +715,14 @@ public class Chart extends Component implements Runnable
 		/***************************************
 		 * Initializes the event dispatching for a certain visualization widget.
 		 *
-		 * @param rVisualization The visualization widget
+		 * @param rChartWidget The visualization widget
 		 */
-		void initEventDispatching(Visualization<?> rVisualization)
+		void initEventDispatching(ChartWidget<?> rChartWidget)
 		{
-			if (rVisualization instanceof CoreChart)
+			if (rChartWidget instanceof CoreChartWidget)
 			{
-				final CoreChart rChart = (CoreChart) rVisualization;
+				final CoreChartWidget<?> rChart =
+					(CoreChartWidget<?>) rChartWidget;
 
 				rChart.addSelectHandler(new SelectHandler()
 					{
@@ -695,7 +736,7 @@ public class Chart extends Component implements Runnable
 				rChart.addOnMouseOverHandler(new OnMouseOverHandler()
 					{
 						@Override
-						public void onMouseOverEvent(OnMouseOverEvent rEvent)
+						public void onMouseOver(OnMouseOverEvent rEvent)
 						{
 							notifyEventHandler(EventType.POINTER_ENTERED);
 						}
@@ -710,9 +751,9 @@ public class Chart extends Component implements Runnable
 						}
 					});
 			}
-			else if (rVisualization instanceof GeoChart)
+			else if (rChartWidget instanceof GeoChart)
 			{
-				GeoChart rGeoChart = (GeoChart) rVisualization;
+				GeoChart rGeoChart = (GeoChart) rChartWidget;
 
 				rGeoChart.addRegionClickHandler(new RegionClickHandler()
 					{

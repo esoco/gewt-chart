@@ -5,7 +5,6 @@
 	<source path='ewt'/>
 
 	<inherits name='de.esoco.GEWT' />	
-	<inherits name='com.google.gwt.visualization.Visualization'/>
-	<inherits name='com.chap.links.Network'/>
+	<inherits name='com.googlecode.gwt.charts.Charts'/>
 			
 </module>

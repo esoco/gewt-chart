@@ -58,6 +58,8 @@ import com.googlecode.gwt.charts.client.event.RegionClickEvent;
 import com.googlecode.gwt.charts.client.event.RegionClickHandler;
 import com.googlecode.gwt.charts.client.event.SelectEvent;
 import com.googlecode.gwt.charts.client.event.SelectHandler;
+import com.googlecode.gwt.charts.client.gauge.Gauge;
+import com.googlecode.gwt.charts.client.gauge.GaugeOptions;
 import com.googlecode.gwt.charts.client.geochart.GeoChart;
 import com.googlecode.gwt.charts.client.geochart.GeoChartColorAxis;
 import com.googlecode.gwt.charts.client.geochart.GeoChartOptions;
@@ -147,6 +149,19 @@ public class Chart extends Component
 			public Options createOptions(boolean b3D)
 			{
 				return ColumnChartOptions.create();
+			}
+		},
+		GAUGE()
+		{
+			@Override
+			public ChartWidget<?> createChart()
+			{
+				return new Gauge();
+			}
+			@Override
+			public Options createOptions(boolean b3D)
+			{
+				return GaugeOptions.create();
 			}
 		},
 		GEO_MAP()
@@ -499,6 +514,12 @@ public class Chart extends Component
 				init();
 			}
 
+			if (aOptions instanceof GeoChartOptions)
+			{
+				// not working if set before...
+				((GeoChartOptions) aOptions).hideLegend();
+			}
+
 			((ChartWidget<Options>) aChartWidget).draw(aDataTables.get(0),
 													   aOptions);
 		}
@@ -623,10 +644,6 @@ public class Chart extends Component
 		else if (aOptions instanceof ColumnChartOptions)
 		{
 			((ColumnChartOptions) aOptions).setIsStacked(bIsStacked);
-		}
-		else if (aOptions instanceof GeoChartOptions)
-		{
-			((GeoChartOptions) aOptions).hideLegend();
 		}
 
 		aDataTables = eChartType.createChartData(getContext(), rChartData);

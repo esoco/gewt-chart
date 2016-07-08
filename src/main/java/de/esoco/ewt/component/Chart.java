@@ -58,6 +58,8 @@ import com.googlecode.gwt.charts.client.event.OnMouseOutEvent;
 import com.googlecode.gwt.charts.client.event.OnMouseOutHandler;
 import com.googlecode.gwt.charts.client.event.OnMouseOverEvent;
 import com.googlecode.gwt.charts.client.event.OnMouseOverHandler;
+import com.googlecode.gwt.charts.client.event.RegionClickEvent;
+import com.googlecode.gwt.charts.client.event.RegionClickHandler;
 import com.googlecode.gwt.charts.client.event.SelectEvent;
 import com.googlecode.gwt.charts.client.event.SelectHandler;
 import com.googlecode.gwt.charts.client.gauge.Gauge;
@@ -723,7 +725,8 @@ public class Chart extends Component
 	}
 
 	/********************************************************************
-	 * TODO: DOCUMENT ME!
+	 * Re-implementation of {@link RegionClickHandler} due to event name typo in
+	 * gwt-charts.
 	 *
 	 * @author eso
 	 */
@@ -739,16 +742,16 @@ public class Chart extends Component
 		public abstract void onRegionSelect(RegionSelectEvent event);
 
 		/***************************************
-		 * @see com.googlecode.gwt.charts.client.event.EventHandler#dispatch(com.googlecode.gwt.charts.client.Properties)
+		 * {@inheritDoc}
 		 */
 		@Override
-		public void dispatch(Properties properties)
+		public void dispatch(Properties rProperties)
 		{
-			onRegionSelect(new RegionSelectEvent(properties));
+			onRegionSelect(new RegionSelectEvent(rProperties));
 		}
 
 		/***************************************
-		 * @see com.googlecode.gwt.charts.client.event.EventHandler#getEventName()
+		 * {@inheritDoc}
 		 */
 		@Override
 		public String getEventName()
@@ -758,7 +761,8 @@ public class Chart extends Component
 	}
 
 	/********************************************************************
-	 * TODO: DOCUMENT ME!
+	 * Subclassing of {@link GeoChart} due to region click event name typo in
+	 * gwt-charts.
 	 *
 	 * @author eso
 	 */
@@ -767,11 +771,11 @@ public class Chart extends Component
 		//~ Methods ------------------------------------------------------------
 
 		/***************************************
-		 * TODO: DOCUMENT ME!
+		 * Add region select handler.
 		 *
-		 * @param  rHandler TODO: DOCUMENT ME!
+		 * @param  rHandler The handler
 		 *
-		 * @return TODO: DOCUMENT ME!
+		 * @return The handler reference
 		 */
 		public HandlerRef addRegionSelectHandler(RegionSelectHandler rHandler)
 		{
@@ -780,7 +784,8 @@ public class Chart extends Component
 	}
 
 	/********************************************************************
-	 * TODO: DOCUMENT ME!
+	 * Re-implementation of {@link RegionClickEvent} due to event name typo in
+	 * gwt-charts.
 	 *
 	 * @author eso
 	 */
@@ -796,11 +801,11 @@ public class Chart extends Component
 		/***************************************
 		 * Creates a new event.
 		 *
-		 * @param properties
+		 * @param rProperties
 		 */
-		public RegionSelectEvent(Properties properties)
+		public RegionSelectEvent(Properties rProperties)
 		{
-			super(NAME, properties);
+			super(NAME, rProperties);
 		}
 
 		//~ Methods ------------------------------------------------------------

@@ -39,6 +39,7 @@ import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.ChartWidget;
 import com.googlecode.gwt.charts.client.ColumnType;
 import com.googlecode.gwt.charts.client.DataTable;
+import com.googlecode.gwt.charts.client.Properties;
 import com.googlecode.gwt.charts.client.corechart.AreaChart;
 import com.googlecode.gwt.charts.client.corechart.AreaChartOptions;
 import com.googlecode.gwt.charts.client.corechart.BarChart;
@@ -50,12 +51,13 @@ import com.googlecode.gwt.charts.client.corechart.LineChart;
 import com.googlecode.gwt.charts.client.corechart.LineChartOptions;
 import com.googlecode.gwt.charts.client.corechart.PieChart;
 import com.googlecode.gwt.charts.client.corechart.PieChartOptions;
+import com.googlecode.gwt.charts.client.event.Event;
+import com.googlecode.gwt.charts.client.event.EventHandler;
+import com.googlecode.gwt.charts.client.event.HandlerRef;
 import com.googlecode.gwt.charts.client.event.OnMouseOutEvent;
 import com.googlecode.gwt.charts.client.event.OnMouseOutHandler;
 import com.googlecode.gwt.charts.client.event.OnMouseOverEvent;
 import com.googlecode.gwt.charts.client.event.OnMouseOverHandler;
-import com.googlecode.gwt.charts.client.event.RegionClickEvent;
-import com.googlecode.gwt.charts.client.event.RegionClickHandler;
 import com.googlecode.gwt.charts.client.event.SelectEvent;
 import com.googlecode.gwt.charts.client.event.SelectHandler;
 import com.googlecode.gwt.charts.client.gauge.Gauge;
@@ -169,7 +171,7 @@ public class Chart extends Component
 			@Override
 			public ChartWidget<?> createChart()
 			{
-				return new GeoChart();
+				return new InternalGeoChart();
 			}
 
 			@Override
@@ -721,6 +723,100 @@ public class Chart extends Component
 	}
 
 	/********************************************************************
+	 * TODO: DOCUMENT ME!
+	 *
+	 * @author eso
+	 */
+	public abstract class RegionSelectHandler implements EventHandler
+	{
+		//~ Methods ------------------------------------------------------------
+
+		/***************************************
+		 * On event fired.
+		 *
+		 * @param event
+		 */
+		public abstract void onRegionSelect(RegionSelectEvent event);
+
+		/***************************************
+		 * @see com.googlecode.gwt.charts.client.event.EventHandler#dispatch(com.googlecode.gwt.charts.client.Properties)
+		 */
+		@Override
+		public void dispatch(Properties properties)
+		{
+			onRegionSelect(new RegionSelectEvent(properties));
+		}
+
+		/***************************************
+		 * @see com.googlecode.gwt.charts.client.event.EventHandler#getEventName()
+		 */
+		@Override
+		public String getEventName()
+		{
+			return RegionSelectEvent.NAME;
+		}
+	}
+
+	/********************************************************************
+	 * TODO: DOCUMENT ME!
+	 *
+	 * @author eso
+	 */
+	static class InternalGeoChart extends GeoChart
+	{
+		//~ Methods ------------------------------------------------------------
+
+		/***************************************
+		 * TODO: DOCUMENT ME!
+		 *
+		 * @param  rHandler TODO: DOCUMENT ME!
+		 *
+		 * @return TODO: DOCUMENT ME!
+		 */
+		public HandlerRef addRegionSelectHandler(RegionSelectHandler rHandler)
+		{
+			return addHandler(rHandler);
+		}
+	}
+
+	/********************************************************************
+	 * TODO: DOCUMENT ME!
+	 *
+	 * @author eso
+	 */
+	static class RegionSelectEvent extends Event
+	{
+		//~ Static fields/initializers -----------------------------------------
+
+		/** The event name. */
+		public static String NAME = "regionClick";
+
+		//~ Constructors -------------------------------------------------------
+
+		/***************************************
+		 * Creates a new event.
+		 *
+		 * @param properties
+		 */
+		public RegionSelectEvent(Properties properties)
+		{
+			super(NAME, properties);
+		}
+
+		//~ Methods ------------------------------------------------------------
+
+		/***************************************
+		 * Returns a string in ISO-3166 format describing the region clicked.
+		 *
+		 * @return a string in ISO-3166
+		 */
+		public String getRegion()
+		{
+			return properties.getString("region");
+		}
+	}
+
+	/********************************************************************
 	 * Dispatcher for list-specific events.
 	 *
 	 * @author eso
@@ -768,14 +864,14 @@ public class Chart extends Component
 						}
 					});
 			}
-			else if (rChartWidget instanceof GeoChart)
+			else if (rChartWidget instanceof InternalGeoChart)
 			{
-				GeoChart rGeoChart = (GeoChart) rChartWidget;
+				InternalGeoChart rGeoChart = (InternalGeoChart) rChartWidget;
 
-				rGeoChart.addRegionClickHandler(new RegionClickHandler()
+				rGeoChart.addRegionSelectHandler(new RegionSelectHandler()
 					{
 						@Override
-						public void onRegionClick(RegionClickEvent rEvent)
+						public void onRegionSelect(RegionSelectEvent rEvent)
 						{
 							notifyEventHandler(EventType.SELECTION,
 											   rEvent.getRegion(),

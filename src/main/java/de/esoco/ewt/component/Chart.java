@@ -669,6 +669,7 @@ public class Chart extends Component
 
 			aLabel.addStyleName(GewtResources.INSTANCE.css()
 								.ewtNoChartDataLabel());
+			rChartPanel.clear();
 			rChartPanel.add(aLabel);
 		}
 	}

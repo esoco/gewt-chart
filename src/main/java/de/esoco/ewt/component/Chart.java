@@ -524,8 +524,11 @@ public class Chart extends Component
 				((GeoChartOptions) aOptions).hideLegend();
 			}
 
-			((ChartWidget<Options>) aChartWidget).draw(aDataTables.get(0),
-													   aOptions);
+			if (aChartWidget != null)
+			{
+				((ChartWidget<Options>) aChartWidget).draw(aDataTables.get(0),
+														   aOptions);
+			}
 		}
 	}
 

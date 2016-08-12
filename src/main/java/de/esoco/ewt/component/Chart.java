@@ -620,6 +620,7 @@ public class Chart extends Component
 	{
 		HasWidgets rChartPanel = (HasWidgets) getWidget();
 
+		rChartPanel.clear();
 		aOptions = eChartType.createOptions(bIs3D);
 
 		if (aOptions instanceof CoreOptions)
@@ -672,7 +673,6 @@ public class Chart extends Component
 
 			aLabel.addStyleName(GewtResources.INSTANCE.css()
 								.ewtNoChartDataLabel());
-			rChartPanel.clear();
 			rChartPanel.add(aLabel);
 		}
 	}

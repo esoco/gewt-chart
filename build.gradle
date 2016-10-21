@@ -44,6 +44,9 @@ gwt {
     modules 'de.esoco.GewtChart'
 }
 
+// sources are need for the GWT compiler
+jar { from sourceSets.main.allSource }
+
 task sourceJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource

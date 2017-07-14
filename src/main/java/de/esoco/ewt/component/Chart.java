@@ -24,6 +24,7 @@ import de.esoco.ewt.impl.gwt.WidgetFactory;
 import de.esoco.ewt.style.StyleData;
 
 import de.esoco.lib.model.DataSet;
+import de.esoco.lib.property.Color;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -437,9 +438,9 @@ public class Chart extends Component
 	 * @return The background color
 	 */
 	@Override
-	public final int getBackgroundColor()
+	public final Color getBackgroundColor()
 	{
-		return Integer.parseInt(sBackgroundColor, 16);
+		return Color.valueOf(sBackgroundColor);
 	}
 
 	/***************************************

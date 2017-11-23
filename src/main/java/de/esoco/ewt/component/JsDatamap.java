@@ -14,63 +14,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-package de.esoco.ewt.build;
+package de.esoco.ewt.component;
 
-import de.esoco.ewt.component.Chart;
-import de.esoco.ewt.component.Chart.ChartType;
-import de.esoco.ewt.component.Component;
-import de.esoco.ewt.component.MapChart;
-import de.esoco.ewt.style.StyleData;
+import jsinterop.annotations.JsPackage;
+import jsinterop.annotations.JsType;
 
 
 /********************************************************************
- * A simple builder that creates {@link Chart} instances in a container builder.
+ * TODO: DOCUMENT ME!
  *
  * @author eso
  */
-public class ChartBuilder
+@JsType(isNative  = true, namespace = JsPackage.GLOBAL, name = "Datamap")
+public class JsDatamap
 {
 	//~ Constructors -----------------------------------------------------------
 
 	/***************************************
-	 * Private, only static use.
+	 * Creates a new instance.
+	 *
+	 * @param rOptions TODO: DOCUMENT ME!
 	 */
-	private ChartBuilder()
+	public JsDatamap(JsDatamapOptions rOptions)
 	{
 	}
 
 	//~ Static methods ---------------------------------------------------------
 
 	/***************************************
-	 * Creates a new {@link Chart} component.
-	 *
-	 * @param  rBuilder   The builder to build the chart with
-	 * @param  rStyleData The style data
-	 * @param  eChartType The type of chart to display or NULL if it is set
-	 *                    later through {@link Chart#setChartType(ChartType)}
-	 *
-	 * @return The new component
+	 * TODO: DOCUMENT ME!
 	 */
-	public static Component addChart(ContainerBuilder<?> rBuilder,
-									 StyleData			 rStyleData,
-									 ChartType			 eChartType)
-	{
-		if (eChartType != ChartType.GEO_MAP)
-		{
-			Chart aChart = new Chart();
-
-			rBuilder.addComponent(aChart, rStyleData, null, null);
-			aChart.setChartType(eChartType);
-
-			return aChart;
-		}
-		else
-		{
-			MapChart aMapChart = new MapChart();
-
-			rBuilder.addComponent(aMapChart, rStyleData, null, null);
-
-			return aMapChart;
-		}
-	}
+	public static native void resize();
 }
